@@ -3,6 +3,28 @@ version: 2.1
 orbs:
   docker: ledger/docker@volatile
 
+executors:
+  machine-executor:
+    description: Image embedding docker 18.06.0-ce, docker-compose 1.22.0
+    machine:
+      image: circleci/classic:201808-01
+
+jobs:
+ push_renamed_image:
+    description: Custom publish
+    executor: machine-executor
+    steps:
+      - docker/set_image_name_env_vars
+      - docker/load_image
+      - run:
+          name: Add Docker tag on the image
+          command: |
+            docker_tag="${DOCKER_NAMESPACE}/${PROJECT_NAME%-docker}:latest"
+            echo "Adding the following tag on the Docker image : ${docker_tag}"
+            docker tag ${DOCKER_NAMESPACE}/${PROJECT_NAME}:${CIRCLE_SHA1} ${docker_tag}
+      - docker/docker_hub_login
+      - run: docker push ${DOCKER_NAMESPACE}/${PROJECT_NAME%-docker}
+
 workflows:
   build_test_and_publish:
     jobs:
@@ -16,7 +38,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - docker/publish_image:
+      - push_renamed_image:
           requires:
             - docker/test_image
           filters:
