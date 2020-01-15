@@ -1,0 +1,10 @@
+port:
+  # goss in only able to detect ipv6 port when listening on dual ipv4/6 port
+  # See bug : https://github.com/aelsabbahy/goss/issues/149
+  tcp6:3128:
+    listening: true
+    ip:
+      - '::'
+process:
+  squid:
+    running: true
