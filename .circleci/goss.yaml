@@ -1,0 +1,3 @@
+http:
+  http://localhost:3128/squid-internal-static/icons/SN.png:
+    status: 200

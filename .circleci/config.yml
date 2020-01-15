@@ -1,0 +1,27 @@
+version: 2.1
+
+orbs:
+  docker: ledger/docker@volatile
+
+workflows:
+  build_test_and_publish:
+    jobs:
+      - docker/build_image:
+          filters:
+            tags:
+              only: /.*/
+      - docker/test_image:
+          requires:
+            - docker/build_image
+          filters:
+            tags:
+              only: /.*/
+      - docker/publish_image:
+          requires:
+            - docker/test_image
+          filters:
+            branches:
+              only:
+                - master
+            tags:
+              only: /.*/
